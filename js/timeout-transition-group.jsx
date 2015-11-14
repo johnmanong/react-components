@@ -140,6 +140,9 @@ var TimeoutTransitionGroupChild = React.createClass({
             } else if (animationType === "leave") {
                 this.animationTimeout = setTimeout(endListener,
                                                    this.props.leaveTimeout);
+            } else if (animationType === "appear") {
+                this.animationTimeout = setTimeout(endListener,
+                                                   this.props.appearTimeout);
             }
         }
 
@@ -180,6 +183,14 @@ var TimeoutTransitionGroupChild = React.createClass({
         }
     },
 
+    componentWillAppear: function(done) {
+        if (this.props.appear) {
+          this.transition('appear', done);
+        } else {
+          done();
+        }
+    },
+
     componentWillEnter: function(done) {
         if (this.props.enter) {
             this.transition('enter', done);
@@ -203,15 +214,18 @@ var TimeoutTransitionGroupChild = React.createClass({
 
 var TimeoutTransitionGroup = React.createClass({
     propTypes: {
+        appearTimeout: React.PropTypes.number.isRequired,
         enterTimeout: React.PropTypes.number.isRequired,
         leaveTimeout: React.PropTypes.number.isRequired,
         transitionName: React.PropTypes.string.isRequired,
+        transitionAppear: React.PropTypes.bool,
         transitionEnter: React.PropTypes.bool,
         transitionLeave: React.PropTypes.bool,
     },
 
     getDefaultProps: function() {
         return {
+            transitionAppear: false,
             transitionEnter: true,
             transitionLeave: true
         };
@@ -220,11 +234,13 @@ var TimeoutTransitionGroup = React.createClass({
     _wrapChild: function(child) {
         return (
             <TimeoutTransitionGroupChild
+                    appearTimeout={this.props.appearTimeout}
                     enterTimeout={this.props.enterTimeout}
                     leaveTimeout={this.props.leaveTimeout}
                     name={this.props.transitionName}
                     enter={this.props.transitionEnter}
-                    leave={this.props.transitionLeave}>
+                    leave={this.props.transitionLeave}
+                    appear={this.props.transitionAppear}>
                 {child}
             </TimeoutTransitionGroupChild>
         );
